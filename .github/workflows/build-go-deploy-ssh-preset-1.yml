@@ -1,0 +1,15 @@
+name: Build Go binary and deploy over SSH (preset 1)
+on:
+  workflow_call:
+jobs:
+  build-go:
+    uses: ./.github/workflows/build-go.yml
+    with:
+      outputFilename: ${{ vars.OUTPUT_FILENAME }}
+  deploy-ssh:
+    uses: ./.github/workflows/deploy-ssh.yml
+    needs: build-go
+    secrets: inherit
+    with:
+      preDeployCommand: screen -S ${{ vars.OUTPUT_FILENAME }} -X quit || true
+      postDeployCommand: chmod 700 ${{ vars.OUTPUT_FILENAME }}; screen -dmS ${{ vars.OUTPUT_FILENAME }} ./${{ vars.OUTPUT_FILENAME }}
