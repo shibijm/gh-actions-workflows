@@ -1,6 +1,13 @@
 name: Build Go binary
 on:
   workflow_call:
+    inputs:
+      outputFilename:
+        required: true
+        type: string
+      additionalFiles:
+        required: false
+        type: string
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,11 +20,11 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Build
-        run: go build -ldflags "-s -w" -trimpath -o artifact/${{ github.event.repository.name }}
+        run: go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.outputFilename }}
       - name: Copy additional files
-        if: ${{ vars.ADDITIONAL_FILES != '' }}
-        run: cp ${{ vars.ADDITIONAL_FILES }} artifact
-      - name: Upload build artifact
+        if: ${{ inputs.additionalFiles != '' }}
+        run: cp ${{ inputs.additionalFiles }} artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: output

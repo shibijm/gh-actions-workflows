@@ -12,7 +12,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Download build artifact
+      - name: Download artifact
         uses: actions/download-artifact@v3
         with:
           name: output
