@@ -11,5 +11,5 @@ jobs:
     needs: build-go
     secrets: inherit
     with:
-      preDeployCommand: screen -S ${{ vars.OUTPUT_FILENAME }} -X quit || true
-      postDeployCommand: chmod 700 ${{ vars.OUTPUT_FILENAME }}; screen -dmS ${{ vars.OUTPUT_FILENAME }} ./${{ vars.OUTPUT_FILENAME }}
+      preDeployCommand: screen -S ${{ vars.OUTPUT_FILENAME }} -X quit; true
+      postDeployCommand: chmod 700 ${{ vars.OUTPUT_FILENAME }}; source .env; screen -dmS ${{ vars.OUTPUT_FILENAME }} ./${{ vars.OUTPUT_FILENAME }}
