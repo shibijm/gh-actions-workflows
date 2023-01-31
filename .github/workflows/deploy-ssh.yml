@@ -1,0 +1,33 @@
+name: Deploy over SSH
+on:
+  workflow_call:
+    inputs:
+      preDeployCommand:
+        required: false
+        type: string
+      postDeployCommand:
+        required: false
+        type: string
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: output
+          path: artifact
+      - name: Create .ssh directory
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+      - name: Run remote pre-deploy command
+        if: ${{ inputs.preDeployCommand != '' }}
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.SSH_DEPLOY_PATH }}; cd ${{ secrets.SSH_DEPLOY_PATH }}; ${{ inputs.preDeployCommand }}"
+      - name: Deploy
+        run: rsync -a artifact/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_DEPLOY_PATH }}
+      - name: Run remote post-deploy command
+        if: ${{ inputs.postDeployCommand != '' }}
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.SSH_DEPLOY_PATH }}; ${{ inputs.postDeployCommand }}"

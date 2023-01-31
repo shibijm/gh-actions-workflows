@@ -1,0 +1,24 @@
+name: Build Go binary
+on:
+  workflow_call:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Build
+        run: go build -ldflags "-s -w" -trimpath -o artifact/${{ github.event.repository.name }}
+      - name: Copy additional files
+        if: ${{ vars.ADDITIONAL_FILES != '' }}
+        run: cp ${{ vars.ADDITIONAL_FILES }} artifact
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: output
+          path: artifact
