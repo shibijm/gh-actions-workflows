@@ -17,6 +17,7 @@ jobs:
     needs: build-nextjs
     with:
       inputArtifactName: output-nextjs
+      inputArtifactPath: ui/out
       executableFilename: ${{ inputs.executableFilename }}
       outputArtifactName: output-go
   deploy-ssh:
