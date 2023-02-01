@@ -35,7 +35,13 @@ jobs:
       - name: Build and export
         run: npx --no next build && npx --no next export
       - name: Upload artifact
+        if: ${{ inputs.outputArtifactName != 'github-pages' }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.outputArtifactName }}
+          path: ${{ inputs.workingDirectory }}/out
+      - name: Upload GitHub Pages artifact
+        if: ${{ inputs.outputArtifactName == 'github-pages' }}
+        uses: actions/upload-pages-artifact@v1
+        with:
           path: ${{ inputs.workingDirectory }}/out

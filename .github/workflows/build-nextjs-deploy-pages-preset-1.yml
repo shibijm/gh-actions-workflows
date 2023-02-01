@@ -1,0 +1,14 @@
+name: Build and export Next.js static site and deploy to GitHub Pages (preset 1)
+on:
+  workflow_call:
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-nextjs:
+    uses: ./.github/workflows/build-nextjs.yml
+    with:
+      outputArtifactName: github-pages
+  deploy-pages:
+    uses: ./.github/workflows/deploy-pages.yml
+    needs: build-nextjs
