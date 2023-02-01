@@ -12,7 +12,7 @@ on:
         required: false
         type: string
 jobs:
-  deploy-ssh:
+  deploy:
     runs-on: ubuntu-latest
     env:
       SSH_TARGET: ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}

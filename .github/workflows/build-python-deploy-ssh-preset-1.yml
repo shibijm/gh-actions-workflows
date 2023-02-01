@@ -8,7 +8,7 @@ on:
       entryPoint:
         required: false
         type: string
-        default: main.py
+        default: ${{ vars.ENTRY_POINT || 'main.py' }}
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true

@@ -11,6 +11,9 @@ on:
       executableFilename:
         required: true
         type: string
+      crossCompile:
+        required: false
+        type: boolean
       additionalOutputFiles:
         required: false
         type: string
@@ -18,7 +21,7 @@ on:
         required: true
         type: string
 jobs:
-  build-go:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
@@ -34,8 +37,11 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - name: Build
+      - name: Build (Linux)
         run: go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.executableFilename }}
+      - name: Build (Windows)
+        if: ${{ inputs.crossCompile }}
+        run: GOOS=windows go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.executableFilename }}.exe
       - name: Bundle additional output files
         if: ${{ inputs.additionalOutputFiles != '' }}
         run: cp ${{ inputs.additionalOutputFiles }} artifact
