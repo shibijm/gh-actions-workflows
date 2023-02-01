@@ -1,8 +1,11 @@
 name: Build Go executable and deploy over SSH (preset 2)
 on:
   workflow_call:
-env:
-  EXECUTABLE_FILENAME: ${{ vars.OUTPUT_FILENAME || github.event.repository.name }}
+    inputs:
+      executableFilename:
+        required: false
+        type: string
+        default: ${{ vars.EXECUTABLE_FILENAME || github.event.repository.name }}
 jobs:
   build-nextjs:
     uses: ./.github/workflows/build-nextjs.yml
@@ -14,7 +17,7 @@ jobs:
     needs: build-nextjs
     with:
       inputArtifactName: output-nextjs
-      executableFilename: ${{ env.EXECUTABLE_FILENAME }}
+      executableFilename: ${{ inputs.executableFilename }}
       outputArtifactName: output-go
   deploy-ssh:
     uses: ./.github/workflows/deploy-ssh.yml
@@ -22,5 +25,5 @@ jobs:
     secrets: inherit
     with:
       inputArtifactName: output-go
-      preDeployCommand: screen -S ${{ env.EXECUTABLE_FILENAME }} -X quit; true
-      postDeployCommand: chmod 700 ${{ env.EXECUTABLE_FILENAME }}; source .env; screen -dmS ${{ env.EXECUTABLE_FILENAME }} ./${{ env.EXECUTABLE_FILENAME }}
+      preDeployCommand: screen -S ${{ inputs.executableFilename }} -X quit; true
+      postDeployCommand: chmod 700 ${{ inputs.executableFilename }}; source .env; screen -dmS ${{ inputs.executableFilename }} ./${{ inputs.executableFilename }}
