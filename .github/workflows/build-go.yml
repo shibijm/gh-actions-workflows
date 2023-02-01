@@ -1,31 +1,43 @@
-name: Build Go binary
+name: Build Go executable
 on:
   workflow_call:
     inputs:
-      outputFilename:
-        required: true
-        type: string
-      additionalFiles:
+      inputArtifactName:
         required: false
         type: string
+      executableFilename:
+        required: true
+        type: string
+      additionalOutputFiles:
+        required: false
+        type: string
+      outputArtifactName:
+        required: true
+        type: string
 jobs:
-  build:
+  build-go:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
+      - name: Download artifact
+        if: ${{ inputs.inputArtifactName != '' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.inputArtifactName }}
+          path: .
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version-file: go.mod
           cache: true
       - name: Build
-        run: go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.outputFilename }}
-      - name: Copy additional files
-        if: ${{ inputs.additionalFiles != '' }}
-        run: cp ${{ inputs.additionalFiles }} artifact
+        run: go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.executableFilename }}
+      - name: Bundle additional output files
+        if: ${{ inputs.additionalOutputFiles != '' }}
+        run: cp ${{ inputs.additionalOutputFiles }} artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: output
+          name: ${{ inputs.outputArtifactName }}
           path: artifact

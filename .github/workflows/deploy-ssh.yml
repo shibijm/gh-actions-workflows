@@ -2,6 +2,9 @@ name: Deploy over SSH
 on:
   workflow_call:
     inputs:
+      inputArtifactName:
+        required: true
+        type: string
       preDeployCommand:
         required: false
         type: string
@@ -9,7 +12,7 @@ on:
         required: false
         type: string
 jobs:
-  deploy:
+  deploy-ssh:
     runs-on: ubuntu-latest
     env:
       SSH_TARGET: ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}
@@ -18,7 +21,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: output
+          name: ${{ inputs.inputArtifactName }}
           path: artifact
       - name: Create .ssh directory
         run: |
