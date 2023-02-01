@@ -1,0 +1,27 @@
+on:
+  workflow_call:
+    inputs:
+      screenName:
+        required: false
+        type: string
+        default: ${{ vars.SCREEN_NAME || github.event.repository.name }}
+      entryPoint:
+        required: false
+        type: string
+        default: main.py
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-python:
+    uses: ./.github/workflows/build-python.yml
+    with:
+      outputArtifactName: output-python
+  deploy-ssh:
+    uses: ./.github/workflows/deploy-ssh.yml
+    needs: build-python
+    secrets: inherit
+    with:
+      inputArtifactName: output-python
+      preDeployCommand: screen -S ${{ inputs.screenName }} -X quit; true
+      postDeployCommand: source .env; screen -dmS ${{ inputs.screenName }} python3.10 ${{ inputs.entryPoint }}

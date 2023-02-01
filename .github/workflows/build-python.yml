@@ -1,0 +1,21 @@
+name: Build Python package
+on:
+  workflow_call:
+    inputs:
+      outputArtifactName:
+        required: true
+        type: string
+jobs:
+  build-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.outputArtifactName }}
+          path: |
+            .
+            !.git
+            !.github

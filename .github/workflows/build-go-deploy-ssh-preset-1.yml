@@ -1,7 +1,10 @@
-name: Build Go executable and deploy over SSH (preset 1)
 on:
   workflow_call:
     inputs:
+      screenName:
+        required: false
+        type: string
+        default: ${{ vars.SCREEN_NAME || github.event.repository.name }}
       executableFilename:
         required: false
         type: string
@@ -21,5 +24,5 @@ jobs:
     secrets: inherit
     with:
       inputArtifactName: output-go
-      preDeployCommand: screen -S ${{ inputs.executableFilename }} -X quit; true
-      postDeployCommand: chmod 700 ${{ inputs.executableFilename }}; source .env; screen -dmS ${{ inputs.executableFilename }} ./${{ inputs.executableFilename }}
+      preDeployCommand: screen -S ${{ inputs.screenName }} -X quit; true
+      postDeployCommand: chmod 700 ${{ inputs.executableFilename }}; source .env; screen -dmS ${{ inputs.screenName }} ./${{ inputs.executableFilename }}
