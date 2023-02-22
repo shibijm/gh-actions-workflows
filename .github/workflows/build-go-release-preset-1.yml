@@ -1,10 +1,6 @@
 on:
   workflow_call:
     inputs:
-      screenName:
-        required: false
-        type: string
-        default: ${{ vars.SCREEN_NAME || github.event.repository.name }}
       executableFilename:
         required: false
         type: string
@@ -17,12 +13,11 @@ jobs:
     uses: ./.github/workflows/build-go.yml
     with:
       executableFilename: ${{ inputs.executableFilename }}
+      crossCompile: true
       outputArtifactName: output-go
-  deploy-ssh:
-    uses: ./.github/workflows/deploy-ssh.yml
+  release-github:
+    uses: ./.github/workflows/release-github.yml
     needs: build-go
-    secrets: inherit
     with:
       inputArtifactName: output-go
-      preDeployCommand: screen -S ${{ inputs.screenName }} -X quit; true
-      postDeployCommand: chmod 700 ${{ inputs.executableFilename }}; source .env; screen -dmS ${{ inputs.screenName }} ./${{ inputs.executableFilename }}
+      version: ${{ github.sha }}

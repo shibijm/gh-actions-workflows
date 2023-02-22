@@ -9,8 +9,12 @@ on:
         required: false
         type: string
         default: ${{ vars.ENTRY_POINT || 'main.py' }}
+      pythonBinary:
+        required: false
+        type: string
+        default: ${{ vars.PYTHON_BINARY || 'python3.10' }}
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }} ${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build-python:
@@ -24,4 +28,4 @@ jobs:
     with:
       inputArtifactName: output-python
       preDeployCommand: screen -S ${{ inputs.screenName }} -X quit; true
-      postDeployCommand: source .env; screen -dmS ${{ inputs.screenName }} python3.10 ${{ inputs.entryPoint }}
+      postDeployCommand: source .env; screen -dmS ${{ inputs.screenName }} ${{ inputs.pythonBinary }} ${{ inputs.entryPoint }}
