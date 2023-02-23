@@ -14,9 +14,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      SSH_TARGET: ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}
-      SSH_DEPLOY_PATH: ${{ secrets.SSH_DEPLOY_PATH }}
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v3
@@ -31,9 +28,9 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
       - name: Run remote pre-deploy command
         if: ${{ inputs.preDeployCommand != '' }}
-        run: ssh $SSH_TARGET "mkdir -p $SSH_DEPLOY_PATH; cd $SSH_DEPLOY_PATH; ${{ inputs.preDeployCommand }}"
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.SSH_DEPLOY_PATH }}; cd ${{ secrets.SSH_DEPLOY_PATH }}; ${{ inputs.preDeployCommand }}"
       - name: Deploy
-        run: rsync -a artifact/ $SSH_TARGET:$SSH_DEPLOY_PATH
+        run: rsync -a artifact/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_DEPLOY_PATH }}
       - name: Run remote post-deploy command
         if: ${{ inputs.postDeployCommand != '' }}
-        run: ssh $SSH_TARGET "cd $SSH_DEPLOY_PATH; ${{ inputs.postDeployCommand }}"
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.SSH_DEPLOY_PATH }}; ${{ inputs.postDeployCommand }}"

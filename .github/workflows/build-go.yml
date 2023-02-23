@@ -38,10 +38,10 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Build (Linux)
-        run: go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.executableFilename }}
+        run: GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.executableFilename }}
       - name: Build (Windows)
         if: ${{ inputs.crossCompile }}
-        run: GOOS=windows go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.executableFilename }}.exe
+        run: GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.executableFilename }}.exe
       - name: Bundle additional output files
         if: ${{ inputs.additionalOutputFiles != '' }}
         run: cp ${{ inputs.additionalOutputFiles }} artifact

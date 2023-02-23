@@ -1,7 +1,11 @@
 on:
   workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
 concurrency:
-  group: ${{ github.workflow }} ${{ github.ref }}
+  group: ${{ github.workflow_ref }}
   cancel-in-progress: true
 jobs:
   build-python:
@@ -14,4 +18,4 @@ jobs:
     with:
       inputArtifactName: output-python
       monoPack: true
-      version: ${{ github.sha }}
+      version: ${{ inputs.version }}

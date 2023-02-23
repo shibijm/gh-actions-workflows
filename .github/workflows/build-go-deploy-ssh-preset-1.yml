@@ -10,7 +10,7 @@ on:
         type: string
         default: ${{ vars.EXECUTABLE_FILENAME || github.event.repository.name }}
 concurrency:
-  group: ${{ github.workflow }} ${{ github.ref }}
+  group: ${{ github.workflow_ref }}
   cancel-in-progress: true
 jobs:
   build-go:

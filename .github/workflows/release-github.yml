@@ -19,20 +19,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh release view v${{ inputs.version }} |& grep "release not found"
+        run: gh release view ${{ inputs.version }} |& grep "release not found"
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.inputArtifactName }}
           path: release
       - name: Prepare release files
-        env:
-          MONO_PACK: ${{ inputs.monoPack }}
-          VERSION: ${{ inputs.version }}
         run: |
           shopt -s extglob
           cd release
-          if $MONO_PACK; then
+          if ${{ inputs.monoPack }}; then
             mkdir release
             mv !(release) release
             mv release ${{ github.event.repository.name }}
@@ -42,20 +39,20 @@ jobs:
             if [[ -f "$filename" ]]; then
               extension=${filename##*.}
               if [[ $extension == exe ]]; then
-                platform=-win
+                platform=-windows-amd64
               elif [[ $basename == $extension ]]; then
-                platform=-linux
+                platform=-linux-amd64
               fi
               mkdir release
               mv "$filename" release
               mv release ${{ github.event.repository.name }}
               filename=${{ github.event.repository.name }}
             fi
-            zip -rm "$basename$platform-$VERSION.zip" "$filename"
+            zip -rm "$basename-${{ inputs.version }}$platform.zip" "$filename"
           done
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
         with:
-          tag_name: v${{ inputs.version }}
-          body: Release for version ${{ inputs.version }}
+          tag_name: ${{ inputs.version }}
+          body: Release for ${{ inputs.version }}
           files: release/*

@@ -5,8 +5,11 @@ on:
         required: false
         type: string
         default: ${{ vars.EXECUTABLE_FILENAME || github.event.repository.name }}
+      version:
+        required: true
+        type: string
 concurrency:
-  group: ${{ github.workflow }} ${{ github.ref }}
+  group: ${{ github.workflow_ref }}
   cancel-in-progress: true
 jobs:
   build-nextjs:
@@ -28,4 +31,4 @@ jobs:
     needs: build-go
     with:
       inputArtifactName: output-go
-      version: ${{ github.sha }}
+      version: ${{ inputs.version }}
