@@ -38,13 +38,16 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Build (Linux)
-        run: GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.executableFilename }}
+        run: GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o artifact/linux-amd64/${{ inputs.executableFilename }}
+      - name: Bundle additional output files (Linux)
+        if: ${{ inputs.additionalOutputFiles != '' }}
+        run: cp ${{ inputs.additionalOutputFiles }} artifact/linux-amd64
       - name: Build (Windows)
         if: ${{ inputs.crossCompile }}
-        run: GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o artifact/${{ inputs.executableFilename }}.exe
-      - name: Bundle additional output files
-        if: ${{ inputs.additionalOutputFiles != '' }}
-        run: cp ${{ inputs.additionalOutputFiles }} artifact
+        run: GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o artifact/windows-amd64/${{ inputs.executableFilename }}.exe
+      - name: Bundle additional output files (Windows)
+        if: ${{ inputs.crossCompile && inputs.additionalOutputFiles != '' }}
+        run: cp ${{ inputs.additionalOutputFiles }} artifact/windows-amd64
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:

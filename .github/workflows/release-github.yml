@@ -30,29 +30,20 @@ jobs:
           shopt -s extglob
           cd release
           if ${{ inputs.monoPack }}; then
-            mkdir release
-            mv !(release) release
-            mv release ${{ github.event.repository.name }}
-          fi
-          for filename in *; do
-            basename=${filename%.*}
-            if [[ -f "$filename" ]]; then
-              extension=${filename##*.}
-              if [[ $extension == exe ]]; then
-                platform=-windows-amd64
-              elif [[ $basename == $extension ]]; then
-                platform=-linux-amd64
+            mkdir ${{ github.event.repository.name }}
+            mv !(${{ github.event.repository.name }}) ${{ github.event.repository.name }}
+            zip -rm ${{ github.event.repository.name }}-${{ inputs.version }}.zip ${{ github.event.repository.name }}
+          else
+            for filename in *; do
+              if [[ -d $filename ]]; then
+                mv $filename ${{ github.event.repository.name }}
+                zip -rm ${{ github.event.repository.name }}-${{ inputs.version }}-$filename.zip ${{ github.event.repository.name }}
               fi
-              mkdir release
-              mv "$filename" release
-              mv release ${{ github.event.repository.name }}
-              filename=${{ github.event.repository.name }}
-            fi
-            zip -rm "$basename-${{ inputs.version }}$platform.zip" "$filename"
-          done
+            done
+          fi
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
         with:
           tag_name: ${{ inputs.version }}
-          body: Release for ${{ inputs.version }}
+          generate_release_notes: true
           files: release/*
