@@ -1,14 +1,18 @@
 on:
   workflow_call:
     inputs:
-      screenName:
+      preBuildCommand:
         required: false
         type: string
-        default: ${{ vars.SCREEN_NAME || github.event.repository.name }}
+        default: ${{ vars.PRE_BUILD_COMMAND }}
       executableFilename:
         required: false
         type: string
         default: ${{ vars.EXECUTABLE_FILENAME || github.event.repository.name }}
+      screenName:
+        required: false
+        type: string
+        default: ${{ vars.SCREEN_NAME || github.event.repository.name }}
 concurrency:
   group: ${{ github.workflow_ref }}
   cancel-in-progress: true
@@ -24,6 +28,7 @@ jobs:
     with:
       inputArtifactName: output-nextjs
       inputArtifactPath: ui/out
+      preBuildCommand: ${{ inputs.preBuildCommand }}
       executableFilename: ${{ inputs.executableFilename }}
       outputArtifactName: output-go
   deploy-ssh:

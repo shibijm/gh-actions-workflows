@@ -1,10 +1,18 @@
 on:
   workflow_call:
     inputs:
+      preBuildCommand:
+        required: false
+        type: string
+        default: ${{ vars.PRE_BUILD_COMMAND }}
       executableFilename:
         required: false
         type: string
         default: ${{ vars.EXECUTABLE_FILENAME || github.event.repository.name }}
+      isGuiApp:
+        required: false
+        type: boolean
+        default: ${{ vars.IS_GUI_APP == 'true' }}
       version:
         required: true
         type: string
@@ -15,8 +23,10 @@ jobs:
   build-go:
     uses: ./.github/workflows/build-go.yml
     with:
+      preBuildCommand: ${{ inputs.preBuildCommand }}
       executableFilename: ${{ inputs.executableFilename }}
-      crossCompile: true
+      buildWindows: true
+      isGuiApp: ${{ inputs.isGuiApp }}
       outputArtifactName: output-go
   release-github:
     uses: ./.github/workflows/release-github.yml
