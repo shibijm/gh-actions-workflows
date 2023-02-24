@@ -15,7 +15,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Abort if release already exists
+      - name: Abort if ref isn't a tag and release already exists
+        if: ${{ github.ref_type != 'tag' }}
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
