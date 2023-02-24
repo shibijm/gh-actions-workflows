@@ -24,6 +24,10 @@ on:
       isGuiApp:
         required: false
         type: boolean
+      essentialOutputFiles:
+        required: false
+        type: string
+        default: README* LICENSE* COPYING* NOTICE*
       additionalOutputFiles:
         required: false
         type: string
@@ -50,18 +54,22 @@ jobs:
       - name: Run pre-build command
         if: ${{ inputs.preBuildCommand != '' }}
         run: ${{ inputs.preBuildCommand }}
-      - name: Build (Linux)
+      - name: Build (x64, Linux)
         if: ${{ inputs.buildLinux }}
-        run: GOARCH=amd64 GOOS=linux go build -ldflags "-s -w" -trimpath -o artifact/linux-amd64/${{ inputs.executableFilename }}
-      - name: Bundle additional output files (Linux)
-        if: ${{ inputs.buildLinux && inputs.additionalOutputFiles != '' }}
-        run: cp ${{ inputs.additionalOutputFiles }} artifact/linux-amd64
-      - name: Build (Windows)
+        env:
+          GOARCH: amd64
+          GOOS: linux
+        run: |
+          go build -ldflags "-s -w" -trimpath -o artifact/linux-amd64/${{ inputs.executableFilename }}
+          cp ${{ inputs.essentialOutputFiles }} ${{ inputs.additionalOutputFiles }} artifact/linux-amd64 2>/dev/null || true
+      - name: Build (x64, Windows)
         if: ${{ inputs.buildWindows }}
-        run: GOARCH=amd64 GOOS=windows go build -ldflags "-s -w${{ (inputs.isGuiApp && ' -H windowsgui') || '' }}" -trimpath -o artifact/windows-amd64/${{ inputs.executableFilename }}.exe
-      - name: Bundle additional output files (Windows)
-        if: ${{ inputs.buildWindows && inputs.additionalOutputFiles != '' }}
-        run: cp ${{ inputs.additionalOutputFiles }} artifact/windows-amd64
+        env:
+          GOARCH: amd64
+          GOOS: windows
+        run: |
+          go build -ldflags "-s -w${{ (inputs.isGuiApp && ' -H windowsgui') || '' }}" -trimpath -o artifact/windows-amd64/${{ inputs.executableFilename }}.exe
+          cp ${{ inputs.essentialOutputFiles }} ${{ inputs.additionalOutputFiles }} artifact/windows-amd64 2>/dev/null || true
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:

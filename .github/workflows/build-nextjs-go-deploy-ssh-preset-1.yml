@@ -1,6 +1,10 @@
 on:
   workflow_call:
     inputs:
+      nextjsWorkingDirectory:
+        required: false
+        type: string
+        default: ${{ vars.NEXTJS_WORKING_DIRECTORY || 'ui' }}
       preBuildCommand:
         required: false
         type: string
@@ -20,14 +24,14 @@ jobs:
   build-nextjs:
     uses: ./.github/workflows/build-nextjs.yml
     with:
-      workingDirectory: ui
+      workingDirectory: ${{ inputs.nextjsWorkingDirectory }}
       outputArtifactName: output-nextjs
   build-go:
     uses: ./.github/workflows/build-go.yml
     needs: build-nextjs
     with:
       inputArtifactName: output-nextjs
-      inputArtifactPath: ui/out
+      inputArtifactPath: ${{ inputs.nextjsWorkingDirectory }}/out
       preBuildCommand: ${{ inputs.preBuildCommand }}
       executableFilename: ${{ inputs.executableFilename }}
       outputArtifactName: output-go
