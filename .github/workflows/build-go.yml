@@ -27,7 +27,7 @@ on:
       essentialOutputFiles:
         required: false
         type: string
-        default: README* LICENSE* COPYING* NOTICE*
+        default: README* LICENSE* COPYRIGHT* COPYING* NOTICE*
       additionalOutputFiles:
         required: false
         type: string
