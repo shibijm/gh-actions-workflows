@@ -28,13 +28,14 @@ jobs:
           path: release
       - name: Prepare release files
         run: |
-          shopt -s extglob
-          cd release
           if ${{ inputs.monoPack }}; then
-            mkdir ${{ github.event.repository.name }}
-            mv !(${{ github.event.repository.name }}) ${{ github.event.repository.name }}
+            mv release ${{ github.event.repository.name }}
+            mkdir release
+            mv ${{ github.event.repository.name }} release
+            cd release
             zip -rm ${{ github.event.repository.name }}-${{ inputs.version }}.zip ${{ github.event.repository.name }}
           else
+            cd release
             for filename in *; do
               if [[ -d $filename ]]; then
                 mv $filename ${{ github.event.repository.name }}

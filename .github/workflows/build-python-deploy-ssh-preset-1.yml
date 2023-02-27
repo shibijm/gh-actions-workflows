@@ -27,5 +27,5 @@ jobs:
     secrets: inherit
     with:
       inputArtifactName: output-python
-      preDeployCommand: screen -S ${{ inputs.screenName }} -X quit; true
+      preDeployCommand: screen -S ${{ inputs.screenName }} -X quit || true
       postDeployCommand: source .env; screen -dmS ${{ inputs.screenName }} ${{ inputs.pythonBinary }} ${{ inputs.entryPoint }}

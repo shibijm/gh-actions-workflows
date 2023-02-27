@@ -31,9 +31,9 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
       - name: Run remote pre-deploy command
         if: ${{ inputs.preDeployCommand != '' }}
-        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.SSH_DEPLOY_PATH }}; cd ${{ secrets.SSH_DEPLOY_PATH }}; ${{ inputs.preDeployCommand }}"
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.SSH_DEPLOY_PATH }}; cd ${{ secrets.SSH_DEPLOY_PATH }} && (${{ inputs.preDeployCommand }})"
       - name: Deploy
         run: rsync -a artifact/${{ inputs.payloadPath }}/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_DEPLOY_PATH }}
       - name: Run remote post-deploy command
         if: ${{ inputs.postDeployCommand != '' }}
-        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.SSH_DEPLOY_PATH }}; ${{ inputs.postDeployCommand }}"
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.SSH_DEPLOY_PATH }} && (${{ inputs.postDeployCommand }})"

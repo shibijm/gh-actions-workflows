@@ -42,5 +42,5 @@ jobs:
     with:
       inputArtifactName: output-go
       payloadPath: linux-amd64
-      preDeployCommand: screen -S ${{ inputs.screenName }} -X quit; true
+      preDeployCommand: screen -S ${{ inputs.screenName }} -X quit || true
       postDeployCommand: chmod 700 ${{ inputs.executableFilename }}; source .env; screen -dmS ${{ inputs.screenName }} ./${{ inputs.executableFilename }}
