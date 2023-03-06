@@ -4,7 +4,7 @@ on:
       nextjsWorkingDirectory:
         required: false
         type: string
-        default: ${{ vars.NEXTJS_WORKING_DIRECTORY || 'ui' }}
+        default: ${{ vars.NEXTJS_WORKING_DIRECTORY || 'web' }}
       preBuildCommand:
         required: false
         type: string
